@@ -1,6 +1,10 @@
 const { test, expect } = require("@playwright/test");
 const { getOTP } = require("../utils/emailHelper");
+<<<<<<< HEAD
 // const { regOTP } = require("../utils/emailHelper1");
+=======
+const { getOTP1 } = require("../utils/emailHelper1");
+>>>>>>> 3b629d05752e419b285eafa09a78944e0414f134
 const { extractOTP } = require("../utils/otpExtractor");
 require("dotenv").config();
 
@@ -32,7 +36,11 @@ test("Email OTP Login", async ({ page }) => {
   await page.getByRole("button", { name: "Verify OTP" }).click();
   await page.waitForLoadState("networkidle");
   await expect(page).toHaveTitle("LexiZ Lawyers");
+<<<<<<< HEAD
   await page.pause();
+=======
+  // await page.pause();
+>>>>>>> 3b629d05752e419b285eafa09a78944e0414f134
 });
 
 // test("Signup with OTP ", async ({ page }) => {
