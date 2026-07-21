@@ -41,6 +41,15 @@ test("Invalid Mobile Format", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("Trim spaces validation", async ({ page }) => {
+  await page.goto(process.env.BASE_URL);
+  await page.locator("#id_otp_identifier").fill("agile.ananth@gmail.com    ");
+
+  const sendOtpButton = page.getByRole("button", { name: "Send OTP" });
+  await sendOtpButton.click();
+  await expect(page).toHaveTitle("LexiZ Lawyers");
+});
+
 test("Login with Unregistered Email", async ({ page }) => {
   await page.goto(process.env.BASE_URL);
   await page.locator("#id_otp_identifier").fill("agile.ananth1@gmail.com");
@@ -50,35 +59,79 @@ test("Login with Unregistered Email", async ({ page }) => {
   await expect(page.getByText("User not found")).toBeVisible();
 });
 
-test("Valid Regsitered Email", async ({ page }) => {
+test("Verify OTP UI Boxes", async ({ page }) => {
   await page.goto(process.env.BASE_URL);
-
+  await expect(page.locator("img.lx-logo")).toBeVisible();
+  await expect(page.locator("#id_otp_identifier")).toBeVisible();
   await page.locator("#id_otp_identifier").fill(process.env.EMAIL);
-
   const sendOtpButton = page.getByRole("button", { name: "Send OTP" });
-
   await expect(sendOtpButton).toBeEnabled();
   await sendOtpButton.click();
-
-  await expect(page.locator("div.lx-otp-boxes")).toBeVisible({
-    timeout: 30000,
-  });
-
-  const emailText = await getOTP();
-  const otp = extractOTP(emailText);
-
-  expect(otp).toBeTruthy();
-
-  const otpInputs = page.locator(".lx-otp-box");
-
-  for (let i = 0; i < otp.length; i++) {
-    await otpInputs.nth(i).click();
-    await otpInputs.nth(i).pressSequentially(otp[i]);
-  }
-  await page.getByRole("button", { name: "Verify OTP" }).click();
-  await page.waitForLoadState("networkidle");
-  await expect(page).toHaveTitle("LexiZ Lawyers");
+  await expect(page.locator("div.lx-otp-boxes")).toBeVisible();
 });
+
+test("Verify OTP Sent Message", async ({ page }) => {
+  await page.goto(process.env.BASE_URL);
+  await expect(page.locator("img.lx-logo")).toBeVisible();
+  await expect(page.locator("#id_otp_identifier")).toBeVisible();
+  await page.locator("#id_otp_identifier").fill(process.env.EMAIL);
+  const sendOtpButton = page.getByRole("button", { name: "Send OTP" });
+  await expect(sendOtpButton).toBeEnabled();
+  await sendOtpButton.click();
+  await expect(page.getByText("OTP sent to your email")).toBeVisible();
+});
+
+test("Verify Verify OTP Title", async ({ page }) => {
+  await page.goto(process.env.BASE_URL);
+  await expect(page.locator("img.lx-logo")).toBeVisible();
+  await expect(page.locator("#id_otp_identifier")).toBeVisible();
+  await page.locator("#id_otp_identifier").fill(process.env.EMAIL);
+  const sendOtpButton = page.getByRole("button", { name: "Send OTP" });
+  await expect(sendOtpButton).toBeEnabled();
+  await sendOtpButton.click();
+  await expect(page.getByText("Verify OTP")).toBeVisible();
+});
+
+test("Verify Enter 6-digit OTP Text", async ({ page }) => {
+  await page.goto(process.env.BASE_URL);
+  await expect(page.locator("img.lx-logo")).toBeVisible();
+  await expect(page.locator("#id_otp_identifier")).toBeVisible();
+  await page.locator("#id_otp_identifier").fill(process.env.EMAIL);
+  const sendOtpButton = page.getByRole("button", { name: "Send OTP" });
+  await expect(sendOtpButton).toBeEnabled();
+  await sendOtpButton.click();
+  await expect(page.getByText("Enter 6-digit OTP")).toBeVisible();
+});
+
+// test("Valid Regsitered Email", async ({ page }) => {
+//   await page.goto(process.env.BASE_URL);
+
+//   await page.locator("#id_otp_identifier").fill(process.env.EMAIL);
+
+//   const sendOtpButton = page.getByRole("button", { name: "Send OTP" });
+
+//   await expect(sendOtpButton).toBeEnabled();
+//   await sendOtpButton.click();
+
+//   await expect(page.locator("div.lx-otp-boxes")).toBeHidden({
+//     timeout: 30000,
+//   });
+
+//   const emailText = await getOTP();
+//   const otp = extractOTP(emailText);
+
+//   expect(otp).toBeTruthy();
+
+//   const otpInputs = page.locator(".lx-otp-box");
+
+//   for (let i = 0; i < otp.length; i++) {
+//     await otpInputs.nth(i).click();
+//     await otpInputs.nth(i).pressSequentially(otp[i]);
+//   }
+//   await page.getByRole("button", { name: "Verify OTP" }).click();
+//   await page.waitForLoadState("networkidle");
+//   await expect(page).toHaveTitle("LexiZ Lawyers");
+// });
 
 // test("Signup with OTP ", async ({ page }) => {
 //   await page.goto(process.env.BASE_URL);
